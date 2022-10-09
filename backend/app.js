@@ -55,7 +55,6 @@ app.post('/api/password', (req, res) => {
   };
 
   let sqlQuery = 'INSERT INTO password SET ?';
-  console.log({ data });
   let query = connection.query(sqlQuery, data, (err, results) => {
     if (err) throw err;
     res.send(apiResponse(results));

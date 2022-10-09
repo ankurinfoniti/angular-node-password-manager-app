@@ -1,7 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
+import { SimpleModalService } from 'ngx-simple-modal';
+
+import { ConfirmComponent } from '../confirm/confirm.component';
 import { PasswordService } from '../services/password.service';
-import { Password, PasswordResponse } from '../model/password';
+import {
+  Password,
+  PasswordReturnResponse,
+  PasswordResponse,
+} from '../model/password';
 
 @Component({
   selector: 'app-password-list',
@@ -9,17 +16,60 @@ import { Password, PasswordResponse } from '../model/password';
   styleUrls: ['./password-list.component.css'],
 })
 export class PasswordListComponent implements OnInit {
+  @Input() set dataChanged(data: boolean) {
+    if (data) {
+      this.getAllPassword();
+    }
+  }
+  @Output() updatePassword = new EventEmitter<Password>();
   passwords: Password[] = [];
-  constructor(private passwordService: PasswordService) {}
+  successAlert: boolean = false;
+  dangerAlert: boolean = false;
+
+  constructor(
+    private passwordService: PasswordService,
+    private SimpleModalService: SimpleModalService
+  ) {}
 
   ngOnInit(): void {
+    this.getAllPassword();
+  }
+
+  getAllPassword(): void {
     this.passwordService.getAllPassword().subscribe({
       next: (data: PasswordResponse) => (this.passwords = data.response),
       error: (error) => console.error(error),
     });
   }
 
-  onEdit(id: number): void {}
+  trackByFn(index: number) {
+    return index;
+  }
 
-  onDelete(i: number): void {}
+  onEdit(password: Password): void {
+    this.updatePassword.emit(password);
+  }
+
+  onDelete(id: number): void {
+    this.SimpleModalService.addModal(ConfirmComponent, {
+      title: 'Confirmation',
+      message: 'Do you really want to delete?',
+    }).subscribe((isConfirmed) => {
+      // Get modal result
+      if (isConfirmed) {
+        this.passwordService.deletePassword(id).subscribe({
+          next: (data: PasswordReturnResponse) => {
+            this.getAllPassword();
+            this.successAlert = true;
+            this.dangerAlert = false;
+          },
+          error: (error) => {
+            this.dangerAlert = true;
+            this.successAlert = false;
+            console.error(error);
+          },
+        });
+      }
+    });
+  }
 }

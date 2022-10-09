@@ -1,12 +1,18 @@
 <app-header></app-header>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
   <div class="row">
-    <div class="col-sm-8">
-      <app-password-list></app-password-list>
+    <div class="col-sm-7">
+      <app-password-list
+        [dataChanged]="notify"
+        (updatePassword)="notifyUpdate($event)"
+      ></app-password-list>
     </div>
-    <div class="col-sm-4">
-      <app-password-add></app-password-add>
+    <div class="col-sm-5">
+      <app-password-add
+        [password]="password"
+        (dataUpdated)="notifyUpdated()"
+      ></app-password-add>
     </div>
   </div>
 </div>

@@ -4,7 +4,11 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment as env } from 'src/environments/environment';
-import { Password, PasswordResponse } from '../model/password';
+import {
+  Password,
+  PasswordReturnResponse,
+  PasswordResponse,
+} from '../model/password';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +25,24 @@ export class PasswordService {
   getPassword(id: number) {
     return this.http
       .get<PasswordResponse>(`${env.BASE_URL}/password/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  savePassword(password: Password) {
+    return this.http
+      .post<PasswordReturnResponse>(`${env.BASE_URL}/password`, password)
+      .pipe(catchError(this.handleError));
+  }
+
+  updatePassword(password: Password, id: number) {
+    return this.http
+      .put<PasswordReturnResponse>(`${env.BASE_URL}/password/${id}`, password)
+      .pipe(catchError(this.handleError));
+  }
+
+  deletePassword(id: number) {
+    return this.http
+      .delete<PasswordReturnResponse>(`${env.BASE_URL}/password/${id}`)
       .pipe(catchError(this.handleError));
   }
 
