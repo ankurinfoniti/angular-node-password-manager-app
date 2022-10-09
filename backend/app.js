@@ -1,8 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const connection = require('./config/db.config');
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 // parse application/json
 app.use(bodyParser.json());
@@ -13,7 +16,8 @@ app.use(bodyParser.json());
  * @return response()
  */
 app.get('/api/passwords', (req, res) => {
-  let sqlQuery = 'SELECT * FROM password';
+  let sqlQuery =
+    'SELECT id, website, username, password, other_login_type as otherLoginType FROM password';
 
   let query = connection.query(sqlQuery, (err, results) => {
     if (err) throw err;
@@ -27,7 +31,9 @@ app.get('/api/passwords', (req, res) => {
  * @return response()
  */
 app.get('/api/password/:id', (req, res) => {
-  let sqlQuery = 'SELECT * FROM password WHERE id=' + req.params.id;
+  let sqlQuery =
+    'SELECT id, website, username, password, other_login_type as otherLoginType FROM password WHERE id=' +
+    req.params.id;
 
   let query = connection.query(sqlQuery, (err, results) => {
     if (err) throw err;
