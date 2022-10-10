@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connection = require('./config/db.config');
+const encrypter = require('./encrypter');
+
 const app = express();
 const port = 3000;
 
@@ -21,6 +23,16 @@ app.get('/api/passwords', (req, res) => {
 
   let query = connection.query(sqlQuery, (err, results) => {
     if (err) throw err;
+    // decrypt data
+    if (results.length) {
+      results = results.map((value) => {
+        if (value.password) {
+          value.password = encrypter.dencrypt(value.password);
+        }
+        return value;
+      });
+    }
+
     res.send(apiResponse(results));
   });
 });
@@ -37,6 +49,15 @@ app.get('/api/password/:id', (req, res) => {
 
   let query = connection.query(sqlQuery, (err, results) => {
     if (err) throw err;
+    // decrypt data
+    if (results.length) {
+      results = results.map((value) => {
+        if (value.password) {
+          value.password = encrypter.dencrypt(value.password);
+        }
+        return value;
+      });
+    }
     res.send(apiResponse(results));
   });
 });
@@ -47,10 +68,11 @@ app.get('/api/password/:id', (req, res) => {
  * @return response()
  */
 app.post('/api/password', (req, res) => {
+  let password = req.body.password ? encrypter.encrypt(req.body.password) : '';
   let data = {
     website: req.body.website,
     username: req.body.username,
-    password: req.body.password,
+    password: password,
     other_login_type: req.body.otherLoginType,
   };
 
@@ -67,13 +89,14 @@ app.post('/api/password', (req, res) => {
  * @return response()
  */
 app.put('/api/password/:id', (req, res) => {
+  let password = req.body.password ? encrypter.encrypt(req.body.password) : '';
   let sqlQuery =
     "UPDATE password SET website='" +
     req.body.website +
     "', username='" +
     req.body.username +
     "', password='" +
-    req.body.password +
+    password +
     "', other_login_type='" +
     req.body.otherLoginType +
     "' WHERE id=" +
