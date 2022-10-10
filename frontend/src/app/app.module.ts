@@ -12,6 +12,7 @@ import { PasswordListComponent } from './password-list/password-list.component';
 import { PasswordAddComponent } from './password-add/password-add.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { StarMaskingPipe } from './pipes/star-masking.pipe';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ConfirmComponent } from './confirm/confirm.component';
     PasswordListComponent,
     PasswordAddComponent,
     ConfirmComponent,
+    StarMaskingPipe,
   ],
   imports: [
     BrowserModule,
